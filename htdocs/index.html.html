@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+
+
+	<head>
+		<title>Search Appointment</title>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+		<script type="text/javascript">
+			
+			$(document).ready(function() {
+
+				//Initial DOM load 
+
+				$('#datepicker').datepicker();
+				$('#timepicker').timepicker();
+
+				//The form action is directed to function for client side validation
+				$('#myform').attr("action",submit_new());
+				$('#addnew2').hide();
+				$('#resultarea').hide();
+
+				// Search functionality implementation
+
+                $("#srchbtn").click(function(){
+                    var srchquery =$('#querysearch').val();
+                    var ID = String(srchquery);
+                    $.ajax({
+                            type: 'GET',
+                            url: '/cgi-bin/ajax.pl',
+                            data: { 'searchqry': ID },
+                            success: function(res) {
+
+                            	// Populating the table based upon the json result
+                            	var result_apptmnt='';
+                            	$.each(res,function(key,value){
+                            		result_apptmnt+='<tr>';
+                            		result_apptmnt+='<td>'+value.ScheduledDate+'</td>';
+                            		result_apptmnt+='<td>'+value.ScheduledTime+'</td>';
+                            		result_apptmnt+='<td>'+value.AppointmentDesc+'</td>'
+                            		result_apptmnt+='</tr>';
+                            	});
+                                
+                            	$('#resultTable').append(result_apptmnt);
+
+                             },
+                            error: function() {alert("did not work");}
+                    });
+                })
+
+                //Replacing NEW button with ADD other elements without server call
+
+                $('#new').click(function(){
+                	
+                	$('#addnew2').show();
+                	$('#addnew').hide();
+                })
+
+                // Reverting the same DOM
+
+                $('#Cancelrecord').click(function(){
+
+                	$('#addnew').show();
+                	$('#addnew2').hide();
+                })
+
+            })
+		</script>
+
+	</head>
+
+
+	<body>
+
+		<div id="main">
+			
+
+
+			<div id="error_section">
+				
+			</div>
+
+			<hr/>
+			<br/>
+
+			<h1>Search Appointments</h1>
+
+			<div id="addnew">
+				<button id="new" value="NEW">NEW </button>
+
+			</div>
+
+			<!--Div element to replace NEW button -->
+
+			<div id ="addnew2">
+				<button id="Addrecord" onclick="addrecord()">ADD</button>
+				<button id="Cancelrecord"> Cancel</button>
+				<br><br>
+				<form name="myform">
+					<p>Date: <input type="text" id="datepicker"></p>
+					<p>Time: <input type="text" id="timepicker"></p>
+					<p>Description: <input type="text" id="apptdesc" maxlength="100"></p>
+					<input type="submit" value="Add">
+				</form>
+			</div>
+
+			<br/><br/>
+
+			
+			<!--Search area-->
+
+			<div id="Search">
+				<div id="searchform">
+					<input type="text" name="querysearch" placeholder="Enter the description">
+					<button id="srchbtn" value="Search">Search</button>
+				</div>
+
+
+			<!--Result table area-->
+				
+				<div id="resultarea">
+					<table id="resultTable">
+						<tr>
+							<th>Date</th>
+							<th>Time</th>
+							<th>Description</th>
+						</tr>
+					</table>
+				</div>
+			</div>
+
+			<hr/>
+		</div>
+			
+
+		<script type="text/javascript">
+			
+			var date1= $('#datepicker').val();
+			var time1 = $('#timepicker').val();
+			var desc= $('#apptdesc').val();
+			
+			function submit_new() {
+				if(isvalidDate(date1) && (desc!="")){
+					$.ajax({
+                            type: 'POST',
+                            url: '/cgi-bin/ajax.pl',
+                            data: { 'Date': date1,
+                            		'Time':time1,
+                            		'Description':desc  },
+                            success: function(res) {
+                            			if(res=="true"){
+                            				$('#main').html('<h1>Successfully submitted !!</h1>');
+                            			}else{
+                            				$('#main').html('<h1>Please try again !!</h1>')
+                            			}
+
+                                      },
+                            error: function() {alert("did not work");}
+                    });
+				}else{
+					$('#error_section').html('Invalid Date or Time !');
+				}
+			}
+
+			isvalidDate(Date d){
+				var dateformat=/^(0?[1-9]|[12][0-9]|3[01])[\/\-](0?[1-9]|1[012])[\/\-]\d{4}$/;
+				if(d.match(dateformat)){
+					return true;
+				}else{
+					return false;
+
+				}
+			}
+
+
+		</script>
+				
+	</body>
+
+
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+
+
+	<head>
+		<title>Search Appoitment</title>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+	</head>
+
+
+	<body>
+
+		<div id="main">
+			<div id="error_section"></div>
+
+			<hr/>
+			<br/>
+
+			<div id="addnew">
+				<button id="new">New</button>	
+			</div>
+
+			<div id="Search">
+				<div id="searchform">
+					<input type="text" name="querysearch" placeholder="Enter the description">
+					<button id="srchbtn"></button>
+				</div>
+
+				<div id="resultform">
+					
+				</div>
+			</div>
+
+		</div>
+			
+		<script type="text/javascript">
+		
+            $(document).ready(function() {
+
+                $("#srchbtn").click(function(){
+                    var srchquery =document.getElementByID('querysearch').value;
+                    $.ajax({
+                            type: 'POST',
+                            url: '/cgi-bin/ajax.pl',
+                            data: { 'data_id': srchquery },
+                            success: function(res) {
+
+                                                        alert("your ID is: " + res.result);
+
+                                                    },
+                            error: function() {alert("did not work");}
+                    });
+                })
+
+            })
+
+
+
+        
+		</script>
+		
+	</body>
+
+
+</html>
